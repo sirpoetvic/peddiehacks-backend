@@ -2,11 +2,12 @@
 
 const { get } = require('http');
 
+// configure environment variables and request module
+require('dotenv').config();
+const request = require('request');
+
 // returns: token
 function getSpotifyToken() {
-  // configure environment variables and request module
-  require('dotenv').config();
-  const request = require('request');
 
   // set up variables for Spotify API
   var client_id = process.env.SPOTIFY_ID;
@@ -28,6 +29,7 @@ function getSpotifyToken() {
   request.post(authOptions, function(error, response, body) {
     if (!error && response.statusCode === 200) {
       var token = body.access_token;
+      console.log(token);
       return token;
     }
     else {
@@ -38,23 +40,27 @@ function getSpotifyToken() {
 
 
 function getArtist(token, artists) {
+  // set up the headers and url for the API
   var options = {
-    url: `https://api.spotify.com/v1/artists/ ${artists}`,
+    url: `https://api.spotify.com/v1/artists/${artists}`,
     headers: {
       'Authorization': `Bearer ${token}`
     }
   };
 
+  // make the request to the API and parse the data, returning artist name
   request(options, (error, response, body) => {
     if (error) {
       console.error('Error:', error);
     } else {
-      console.log('Response:', body);
+      console.log('Status:', response.statusCode);
+      data = JSON.parse(body);
+      console.log('Artist Name:', data.name);
     }
   });
 }
 
-
 // token = getSpotifyToken();
-token = "BQAHX12FMIxu6CNeRWdpckkeUO79eLqQ80GB4yBlPjPN4dK26SXjd_M_x0YwO4kqII7fCxdB3M2TVto6qKxpn7DL7LI7tE6h6OnJKxiqHEvuzX50egc"
-getArtist(token, "4V8LLVI7PbaPR0K2TGSxFF?si=SjK33By4SkqoJXbgdbb9_A");
+token = "BQCrNnD8Q6sWClAZAjGcnFGOL3YHiuE0np4ajHCuf6TcIxC-E_kS7cnxSJGPOmXs_J6kYl0yN1NZT-FoMTwH5AQ27VjYs9CiehGMQ7yciwNSRhzbVKQ"
+artistid = "4Z8W4fKeB5YxbusRsdQVPb";
+getArtist(token, artistid);
